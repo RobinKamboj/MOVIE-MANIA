@@ -1,28 +1,285 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+/*HEADER FILES HEADER FILES HEADER FILES*/
+#include<iostream.h>
+#include<fstream.h>
+#include<stdio.h>
+#include<string.h>
 
-# Precompiled Headers
-*.gch
-*.pch
+/*STRUCTURE STRUCTURE STRUCTURE STRUCTURE*/
+struct movie
+{
+ char name[35];
+ float imdb;
+ char review[50];
+ char director[25];
+ int year;
+}m;
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+/*FN TO ENTER MOVIE DETAILS FN TO ENTER MOVIE DETAILS*/
+void enter()
+{
+ movie m;
+ char choice_1;
+ do
+ {
+  printf("enter the NAME OF THE MOVIE\n");
+  gets(m.name);
+  printf("enter the IMDB RATING OF THE MOVIE\n");
+  scanf("%d",&m.imdb);
+  printf("enter the DIRECTOR NAME OF THE MOVIE\n");
+  gets(m.director);
+  printf("enter the REVIEW OF THE MOVIE\n");
+  gets(m.review);
+  printf("enter the YEAR OF THE MOVIE'S RELEASE\n");
+  scanf("%d",m.year);
 
-# Fortran module files
-*.mod
+  ofstream  ofile("moviezz",ios::binary|ios::out);
+  ofile.write((char*)&m,sizeof(m));
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+  printf("do you wish to enter more movies info(y/n)\n");
+  scanf("%d",&choice_1);
+  printf("\n");
+  printf("\n");
+  printf("\n");
+ }
+ while(choice_1=='y'||choice_1=='Y');
+}
 
-# Executables
-*.exe
-*.out
-*.app
+/*FN TO DISPLAY MOVIE DETAILS FN TO DISPLAY MOVIE DETAILS*/
+void display(movie x)
+{
+  printf("NAME OF THE MOVIE\t",x.name);
+  printf("IMDB RATING OF THE MOVIE\t",x.imdb);
+  printf("DIRECTOR NAME OF THE MOVIE\t",x.director);
+  printf("REVIEW OF THE MOVIE\t",x.review);
+  printf("YEAR OF THE MOVIE'S RELEASE\t",x.year);
+  printf("\n\n\n");
+}
+
+
+
+/*FN TO SEARCH AND DISPLAY MOVIE DETAILS FN TO SEARCH AND DISPLAY DETAILS*/
+void search()
+{
+  movie m;
+  char choice_2;
+  do
+ {
+  char search_name[35];
+  int search_year;
+  printf("search by movie name(A) or by movie year(B)\n");
+  scanf("%d",&choice_2);
+
+  ifstream ifile("moviezz",ios::binary|ios::in);
+  ifile.seekg(0);
+
+	ifile.read((char*)&m,sizeof(m));
+  switch(choice_2)
+  {
+	case 'A':
+	 {
+	  printf("enter the NAME OF THE MOVIE\n");
+	  gets(search_name);
+		 if(strcmp(m.name,search_name))
+		  {
+			display(m);
+		  }
+		 else
+		  {
+			printf("no match\n");
+		  }
+	  break;
+	 }
+	 case 'B':
+	 {
+		printf("enter the RELEASE YEAR OF THE MOVIE\n");
+		scanf("%d",&search_year);
+		 if(m.year==search_year)
+		  {
+			display(m);
+		  }
+		 else
+		  {
+			printf("no match\n");
+		  }
+		break;
+	 }
+  }
+  printf("do you want to search more movies info(y/n)\n");
+  scanf("%d",&choice_2);
+  printf("\n\n\n");
+ }
+while(choice_2=='y'||choice_2=='Y');
+}
+
+/*FN TO MODIFY MOVIE DETAILS FN TO MODIFY MOVIE DETAILS*/
+void modify(movie y)
+{
+printf("NAME OF THE MOVIE\t",y.name);
+printf("IMDB RATING OF THE MOVIE\t",y.imdb);
+printf("NAME OF THE DIRECTOR\t",y.director);
+printf("REVIEW OF THE MOVIE\t",y.review);
+printf("YEAR OF RELEASE\t",y.year);
+char n[35];
+int i;
+char r[50];
+char d[25];
+int e;
+printf("ENTER NEW DETAILS\n");
+printf("new name of the movie(enter dot(.) To retain old)\n");
+gets(n);
+printf("new imbd(enter zero(0) to retain old imdb)\n");
+scanf("%d",&i);
+printf("new director name(enter dot(.) To retain old)\n");
+gets(d);
+printf("new review(enter dot(.) to retain old)\n");
+gets(r);
+printf("new year of release(enter zero(0) to retain old)\n");
+scanf("%d",e);
+if(strcmp(n,".")!=0)
+strcpy(y.name,n);
+if(i!=0)
+y.imdb=i;
+if(strcmp(d,".")!=0)
+strcpy(y.director,d);
+if(strcmp(r,".")!=0)
+strcpy(y.review,r);
+if(e!=0)
+y.year=e;
+}
+
+/*FN TO EDIT MOVIE DETAILS FN TO EDIT MOVIE DETAILS*/
+void edit()
+{
+char ch;
+	 do
+	 {
+	       movie y;
+
+           fstream fio("moviezz",ios::binary||ios::in||ios::out);
+           char na[35];
+           long pos;
+           printf("enter name of the movie whose record is to be modified\n");
+           gets(na);
+           while(!fio.eof())
+                      {
+                            pos=fio.tellg();
+                            fio.read((char*)&y,sizeof(y));
+                            if(strcmp(y.name,na))
+                            {
+                                modify(y);
+                                fio.seekg(pos);
+                                fio.seekp(-1*sizeof(y),ios::cur);
+                                fio.write((char*)&y,sizeof(y));
+                            }
+					  }ifstream ifile("moviezz",ios::binary|ios::in);
+            display(y);
+
+            printf("do you want to do more editing(y/n)\n");
+            scanf("%s",&ch);
+            printf("\n\n\n");
+	 }
+		while(ch=='y'||ch=='Y');
+	}
+
+/*FN TO SORT MOVIES ON THE BASIS OF THEIR IMDB RATINGS*/
+void arrange(movie z[],int size)
+			{
+			  int a,j;
+			  movie temp;
+			  for(a=0;a<size;a++)
+							{
+							 for(j=0;j<size-1-a;j++)
+							  {
+								if(z[j].imdb>z[j+1].imdb)
+								  {
+									  temp=z[j];
+									  z[j]=z[j+1];
+									  z[j+1]=temp;
+								  }
+							  }
+						  }
+        for(int q=0;q<size;q++)
+            {
+                display(z[q]);
+            }
+}
+
+
+/*FN TO SORT MOVIES ON THE BASIS OF YEAR OF THEIR RELEASE*/
+void sorting(movie p[],int size)
+	 {
+			int cc,vv;
+			movie te;
+			for(cc=0;cc<size;cc++)
+					{
+					  for(vv=0;vv<size-1-cc;vv++)
+						 {
+								if(p[vv].year>p[vv+1].year)
+								{
+									 te=p[vv];
+									 p[vv]=p[vv+1];
+									 p[vv+1]=te;
+								}
+						 }
+					}
+			  for(int xz=0;xz<size;xz++)
+				  {
+					  display(p[xz]);
+                      printf("\n\n\n");
+				  }
+}
+
+/* MAIN FUNCTION MAIN FUNCTION MAIN FUNCTION */
+int main()
+{
+  movie mov[50];
+  int a,b;
+  int choice;
+
+ do
+ {
+	  printf("choose an option among the ones provided below:\n");
+	  printf("(1) ADD A MOVIE INFO  \n");
+	  printf("(2) SEARCH FOR A MOVIE INFO (BY NAME,YEAR) \n");
+	  printf("(3) EDIT/MODIFY A MOVIE INFO \n");
+	  printf("(4) TOP MOVIES (sorted by imdb rating)\n");
+	  printf("(5) SORT BY YEAR \n");
+	  printf("(6) EXIT \n");
+
+	  scanf("%d",&choice);
+
+  switch(choice)
+  {
+	case 1:
+	{
+	 enter();
+	 break;
+	}
+	case 2:
+	{
+		search();
+		break;
+	}
+	 case 3:
+	{
+		edit();
+		break;
+	}
+	 case 4:
+	{
+		printf("enter the number of movies you would want to arrange\n");
+		scanf("%d",&b);
+		arrange(mov,b);
+		break;
+	}
+	 case 5:
+	{
+		printf("enter the number of initial movies you require\n");
+		scanf("%d",&a);
+		sorting(mov,a);
+		break;
+	}
+  }
+ }while(choice<6);
+ return 0;
+}
